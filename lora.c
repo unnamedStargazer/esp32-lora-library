@@ -389,7 +389,7 @@ int lora_packet_rssi(void)
 /**
  * Return last packet's SNR (signal to noise ratio).
  */
-int lora_packet_snr(void)
+float lora_packet_snr(void)
 {
    return ((int8_t)lora_read_reg(REG_PKT_SNR_VALUE)) * 0.25;
 }
