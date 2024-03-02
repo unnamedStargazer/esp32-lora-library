@@ -18,8 +18,7 @@ static long __frequency;
  * @param reg Register index.
  * @param val Value to write.
  */
-void 
-lora_write_reg(int reg, int val)
+void lora_write_reg(int reg, int val)
 {
    uint8_t out[2] = { 0x80 | reg, val };
    uint8_t in[2];
@@ -41,8 +40,7 @@ lora_write_reg(int reg, int val)
  * @param reg Register index.
  * @return Value of the register.
  */
-int
-lora_read_reg(int reg)
+int lora_read_reg(int reg)
 {
    uint8_t out[2] = { reg, 0xff };
    uint8_t in[2];
@@ -63,8 +61,7 @@ lora_read_reg(int reg)
 /**
  * Perform physical reset on the Lora chip
  */
-void 
-lora_reset(void)
+void lora_reset(void)
 {
    gpio_set_level(CONFIG_RST_GPIO, 0);
    vTaskDelay(pdMS_TO_TICKS(1));
@@ -76,8 +73,7 @@ lora_reset(void)
  * Configure explicit header mode.
  * Packet size will be included in the frame.
  */
-void 
-lora_explicit_header_mode(void)
+void lora_explicit_header_mode(void)
 {
    __implicit = 0;
    lora_write_reg(REG_MODEM_CONFIG_1, lora_read_reg(REG_MODEM_CONFIG_1) & 0xfe);
@@ -88,8 +84,7 @@ lora_explicit_header_mode(void)
  * All packets will have a predefined size.
  * @param size Size of the packets.
  */
-void 
-lora_implicit_header_mode(int size)
+void lora_implicit_header_mode(int size)
 {
    __implicit = 1;
    lora_write_reg(REG_MODEM_CONFIG_1, lora_read_reg(REG_MODEM_CONFIG_1) | 0x01);
@@ -100,8 +95,7 @@ lora_implicit_header_mode(int size)
  * Sets the radio transceiver in idle mode.
  * Must be used to change registers and access the FIFO.
  */
-void 
-lora_idle(void)
+void lora_idle(void)
 {
    lora_write_reg(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_STDBY);
 }
@@ -110,8 +104,7 @@ lora_idle(void)
  * Sets the radio transceiver in sleep mode.
  * Low power consumption and FIFO is lost.
  */
-void 
-lora_sleep(void)
+void lora_sleep(void)
 { 
    lora_write_reg(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_SLEEP);
 }
@@ -120,8 +113,7 @@ lora_sleep(void)
  * Sets the radio transceiver in receive mode.
  * Incoming packets will be received.
  */
-void 
-lora_receive(void)
+void lora_receive(void)
 {
    lora_write_reg(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_RX_CONTINUOUS);
 }
@@ -130,8 +122,7 @@ lora_receive(void)
  * Configure power level for transmission
  * @param level 2-17, from least to most power
  */
-void 
-lora_set_tx_power(int level)
+void lora_set_tx_power(int level)
 {
    // RF9x module uses PA_BOOST pin
    if (level < 2) level = 2;
@@ -143,8 +134,7 @@ lora_set_tx_power(int level)
  * Set carrier frequency.
  * @param frequency Frequency in Hz
  */
-void 
-lora_set_frequency(long frequency)
+void lora_set_frequency(long frequency)
 {
    __frequency = frequency;
 
@@ -159,8 +149,7 @@ lora_set_frequency(long frequency)
  * Set spreading factor.
  * @param sf 6-12, Spreading factor to use.
  */
-void 
-lora_set_spreading_factor(int sf)
+void lora_set_spreading_factor(int sf)
 {
    if (sf < 6) sf = 6;
    else if (sf > 12) sf = 12;
@@ -180,8 +169,7 @@ lora_set_spreading_factor(int sf)
  * Set bandwidth (bit rate)
  * @param sbw Bandwidth in Hz (up to 500000)
  */
-void 
-lora_set_bandwidth(long sbw)
+void lora_set_bandwidth(long sbw)
 {
    int bw;
 
@@ -202,8 +190,7 @@ lora_set_bandwidth(long sbw)
  * Set coding rate 
  * @param denominator 5-8, Denominator for the coding rate 4/x
  */ 
-void 
-lora_set_coding_rate(int denominator)
+void lora_set_coding_rate(int denominator)
 {
    if (denominator < 5) denominator = 5;
    else if (denominator > 8) denominator = 8;
@@ -216,8 +203,7 @@ lora_set_coding_rate(int denominator)
  * Set the size of preamble.
  * @param length Preamble length in symbols.
  */
-void 
-lora_set_preamble_length(long length)
+void lora_set_preamble_length(long length)
 {
    lora_write_reg(REG_PREAMBLE_MSB, (uint8_t)(length >> 8));
    lora_write_reg(REG_PREAMBLE_LSB, (uint8_t)(length >> 0));
@@ -227,8 +213,7 @@ lora_set_preamble_length(long length)
  * Change radio sync word.
  * @param sw New sync word to use.
  */
-void 
-lora_set_sync_word(int sw)
+void lora_set_sync_word(int sw)
 {
    lora_write_reg(REG_SYNC_WORD, sw);
 }
@@ -236,8 +221,7 @@ lora_set_sync_word(int sw)
 /**
  * Enable appending/verifying packet CRC.
  */
-void 
-lora_enable_crc(void)
+void lora_enable_crc(void)
 {
    lora_write_reg(REG_MODEM_CONFIG_2, lora_read_reg(REG_MODEM_CONFIG_2) | 0x04);
 }
@@ -245,8 +229,7 @@ lora_enable_crc(void)
 /**
  * Disable appending/verifying packet CRC.
  */
-void 
-lora_disable_crc(void)
+void lora_disable_crc(void)
 {
    lora_write_reg(REG_MODEM_CONFIG_2, lora_read_reg(REG_MODEM_CONFIG_2) & 0xfb);
 }
@@ -254,8 +237,7 @@ lora_disable_crc(void)
 /**
  * Perform hardware initialization.
  */
-int 
-lora_init(void)
+int lora_init(void)
 {
    esp_err_t ret;
 
@@ -328,8 +310,7 @@ lora_init(void)
  * @param buf Data to be sent
  * @param size Size of data.
  */
-void 
-lora_send_packet(uint8_t *buf, int size)
+void lora_send_packet(uint8_t *buf, int size)
 {
    /*
     * Transfer data to radio.
@@ -358,8 +339,7 @@ lora_send_packet(uint8_t *buf, int size)
  * @param size Available size in buffer (bytes).
  * @return Number of bytes received (zero if no packet available).
  */
-int 
-lora_receive_packet(uint8_t *buf, int size)
+int lora_receive_packet(uint8_t *buf, int size)
 {
    int len = 0;
 
@@ -392,8 +372,7 @@ lora_receive_packet(uint8_t *buf, int size)
 /**
  * Returns non-zero if there is data to read (packet received).
  */
-int
-lora_received(void)
+int lora_received(void)
 {
    if(lora_read_reg(REG_IRQ_FLAGS) & IRQ_RX_DONE_MASK) return 1;
    return 0;
@@ -402,8 +381,7 @@ lora_received(void)
 /**
  * Return last packet's RSSI.
  */
-int 
-lora_packet_rssi(void)
+int lora_packet_rssi(void)
 {
    return (lora_read_reg(REG_PKT_RSSI_VALUE) - (__frequency < 868E6 ? 164 : 157));
 }
@@ -411,8 +389,7 @@ lora_packet_rssi(void)
 /**
  * Return last packet's SNR (signal to noise ratio).
  */
-float 
-lora_packet_snr(void)
+int lora_packet_snr(void)
 {
    return ((int8_t)lora_read_reg(REG_PKT_SNR_VALUE)) * 0.25;
 }
@@ -420,8 +397,7 @@ lora_packet_snr(void)
 /**
  * Shutdown hardware.
  */
-void 
-lora_close(void)
+void lora_close(void)
 {
    lora_sleep();
 //   close(__spi);  FIXME: end hardware features after lora_close
@@ -432,8 +408,7 @@ lora_close(void)
 //   __rst = -1;
 }
 
-void 
-lora_dump_registers(void)
+void lora_dump_registers(void)
 {
    int i;
    printf("00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n");
