@@ -84,5 +84,6 @@ void lora_close(void);
 int lora_initialized(void);
 void lora_dump_registers(void);
 void lora_write_reg(int reg, int val);
+int lora_read_reg(int reg);
 
 #endif

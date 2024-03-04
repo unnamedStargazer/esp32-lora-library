@@ -97,6 +97,7 @@ void lora_implicit_header_mode(int size)
  */
 void lora_idle(void)
 {
+   // Set to Lora transmit mode and standby state
    lora_write_reg(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_STDBY);
 }
 
@@ -106,6 +107,7 @@ void lora_idle(void)
  */
 void lora_sleep(void)
 { 
+   // Set to Lora transmit mode and sleep state
    lora_write_reg(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_SLEEP);
 }
 
@@ -411,8 +413,10 @@ void lora_close(void)
 void lora_dump_registers(void)
 {
    int i;
-   printf("00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n");
-   for(i=0; i<0x40; i++) {
+   printf("XX | x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 xA xB xC xD xE xF\n");
+   printf("-- | -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --\n");
+   for(i=0; i<0x80; i++) {
+      if ((i & 0x0f) == 0x00) printf("%1Xx | ", (i & 0xf0) >> 4);
       printf("%02X ", lora_read_reg(i));
       if((i & 0x0f) == 0x0f) printf("\n");
    }
